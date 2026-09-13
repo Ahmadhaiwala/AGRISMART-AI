@@ -59,6 +59,23 @@ Once the server is running, access the interactive API documentation:
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
+## API Endpoints
+
+- `GET /` - Root endpoint with API information
+- `GET /health` - Health check
+- `POST /api/v1/predict` - Predict plant disease from image
+- `GET /api/v1/model/info` - Get model information
+- `POST /api/v1/model/reload` - Reload the model (admin)
+
+## Model Information
+
+The API uses a CNN model for plant disease classification trained on 38 different plant disease classes. The model is automatically downloaded from HuggingFace Hub on first startup.
+
+- **Model**: Plant Disease CNN Baseline
+- **HuggingFace Repo**: [Ahmadhaiwala/agro_model](https://huggingface.co/Ahmadhaiwala/agro_model)
+- **Classes**: 38 plant disease categories
+- **Input Size**: 224x224 RGB images
+
 ## Project Structure
 
 ```
@@ -96,6 +113,10 @@ backend/
 
 - **FastAPI**: Modern web framework for building APIs
 - **Uvicorn**: ASGI server for FastAPI
+- **PyTorch**: Deep learning framework for model inference
+- **TorchVision**: Computer vision utilities
+- **Pillow**: Image processing
+- **HuggingFace Hub**: Model downloading from HuggingFace
 - **Pydantic**: Data validation and settings management
 
 ## Development

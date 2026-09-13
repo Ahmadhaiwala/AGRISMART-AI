@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 from typing import List
+import os
 
 
 class Settings(BaseSettings):
@@ -20,6 +21,17 @@ class Settings(BaseSettings):
     CORS_CREDENTIALS: bool = True
     CORS_METHODS: List[str] = ["*"]
     CORS_HEADERS: List[str] = ["*"]
+    
+    # Model Settings
+    MODEL_PATH: str = "models/plant_disease_cnn_baseline.pth"
+    HF_MODEL_REPO: str = "Ahmadhaiwala/agro_model"
+    HF_MODEL_FILE: str = "plant_disease_cnn_baseline.pth"
+    DEVICE: str = "cuda" if os.getenv("CUDA_AVAILABLE", "false").lower() == "true" else "cpu"
+    
+    # Image Processing
+    IMAGE_SIZE: int = 224
+    MAX_IMAGE_SIZE: int = 10 * 1024 * 1024  # 10MB
+    ALLOWED_EXTENSIONS: List[str] = [".jpg", ".jpeg", ".png"]
     
     class Config:
         env_file = ".env"
