@@ -63,21 +63,29 @@ Once the server is running, access the interactive API documentation:
 
 ```
 backend/
-├── .venv/              # Virtual environment (not in git)
-├── main.py             # Main application entry point
-├── requirements.txt    # Python dependencies
-├── .gitignore         # Git ignore rules
-└── README.md          # This file
+├── .venv/                  # Virtual environment (not in git)
+├── core/                   # Core configuration
+│   ├── __init__.py
+│   └── config.py          # Application settings
+├── api/                    # API layer
+│   ├── __init__.py
+│   ├── deps.py            # API dependencies
+│   └── routes/            # API routes
+│       ├── __init__.py
+│       ├── root.py        # Root endpoints
+│       └── health.py      # Health check
+├── main.py                # Application entry point
+├── requirements.txt       # Python dependencies
+├── .gitignore            # Git ignore rules
+├── .env                  # Environment variables (not in git)
+└── README.md             # This file
 ```
 
 ## Dependencies
 
 - **FastAPI**: Modern web framework for building APIs
 - **Uvicorn**: ASGI server for FastAPI
-- **PyTorch**: Deep learning framework
-- **TorchVision**: Computer vision models and utilities
-- **Pillow**: Image processing library
-- **NumPy**: Numerical computing library
+- **Pydantic**: Data validation and settings management
 
 ## Development
 

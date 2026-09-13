@@ -1,18 +1,7 @@
 # Web Framework
 fastapi==0.109.0
 uvicorn[standard]==0.27.0
-python-multipart==0.0.6
 
-# Deep Learning
-torch==2.2.0
-torchvision==0.17.0
-
-# Image Processing
-Pillow==10.2.0
-
-# Data Processing
-numpy==1.26.3
-
-# Optional: API documentation and validation
+# Configuration
 pydantic==2.5.3
 pydantic-settings==2.1.0
