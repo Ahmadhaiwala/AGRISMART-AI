@@ -63,22 +63,33 @@ Once the server is running, access the interactive API documentation:
 
 ```
 backend/
-├── .venv/                  # Virtual environment (not in git)
-├── core/                   # Core configuration
+├── .venv/                              # Virtual environment (not in git)
+├── app/                                # Main application package
+│   ├── main.py                         # FastAPI application factory
+│   ├── core/                           # Core configuration
+│   │   ├── __init__.py
+│   │   └── config.py                   # Settings and configuration
+│   ├── database/                       # Database configuration
+│   │   ├── __init__.py
+│   │   └── base.py                     # Database setup
+│   └── modules/                        # Feature modules
+│       └── disease_detection/          # Disease detection module
+│           ├── __init__.py
+│           ├── router.py               # API endpoints
+│           ├── service.py              # Business logic
+│           ├── model.py                # Database models
+│           └── schemas.py              # Pydantic schemas
+├── models/                             # Trained ML models
+│   └── .gitkeep
+├── tests/                              # Test suite
 │   ├── __init__.py
-│   └── config.py          # Application settings
-├── api/                    # API layer
-│   ├── __init__.py
-│   ├── deps.py            # API dependencies
-│   └── routes/            # API routes
-│       ├── __init__.py
-│       ├── root.py        # Root endpoints
-│       └── health.py      # Health check
-├── main.py                # Application entry point
-├── requirements.txt       # Python dependencies
-├── .gitignore            # Git ignore rules
-├── .env                  # Environment variables (not in git)
-└── README.md             # This file
+│   └── test_main.py
+├── main.py                             # Application entry point
+├── requirements.txt                    # Python dependencies
+├── alembic.ini                         # Database migrations config
+├── .env                                # Environment variables (not in git)
+├── .gitignore                          # Git ignore rules
+└── README.md                           # This file
 ```
 
 ## Dependencies
