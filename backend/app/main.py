@@ -25,7 +25,7 @@ def create_app() -> FastAPI:
     )
     
     # Include routers
-    app.include_router(disease_router, prefix="/api/testing", tags=["Disease Detection"])
+    app.include_router(disease_router, prefix="/api/v1", tags=["Disease Detection"])
     
     @app.get("/")
     async def root():
@@ -33,7 +33,8 @@ def create_app() -> FastAPI:
         return {
             "app_name": settings.APP_NAME,
             "version": settings.APP_VERSION,
-            "docs": "/docs"
+            "docs": "/docs",
+            "predict_ui": "/api/v1/predict"
         }
     
     @app.get("/health")

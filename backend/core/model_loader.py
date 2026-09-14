@@ -5,6 +5,7 @@ from typing import Optional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torchvision import models
 from huggingface_hub import hf_hub_download
 
 from core.config import settings
@@ -13,98 +14,34 @@ from core.config import settings
 logger = logging.getLogger(__name__)
 
 
-class PlantDiseaseCNN(nn.Module):
+class PlantDiseaseEfficientNet(nn.Module):
     """
-    CNN model used for the 15-class PlantVillage
-    plant disease classification model.
+    EfficientNet-B0 model for 38-class plant disease classification.
     """
 
-    def __init__(self, num_classes: int = 15):
+    def __init__(self, num_classes: int = 38):
         super().__init__()
 
-        # -------------------------
-        # Convolutional layers
-        # -------------------------
-
-        self.conv1 = nn.Conv2d(
-            in_channels=3,
-            out_channels=32,
-            kernel_size=3,
-            padding=1
+        # Load EfficientNet-B0 architecture (without the wrapper)
+        efficientnet = models.efficientnet_b0(weights=None)
+        
+        # Replace the classifier
+        in_features = efficientnet.classifier[1].in_features
+        efficientnet.classifier = nn.Sequential(
+            nn.Dropout(p=0.2, inplace=True),
+            nn.Linear(in_features, num_classes)
         )
-
-        self.conv2 = nn.Conv2d(
-            in_channels=32,
-            out_channels=64,
-            kernel_size=3,
-            padding=1
-        )
-
-        self.conv3 = nn.Conv2d(
-            in_channels=64,
-            out_channels=128,
-            kernel_size=3,
-            padding=1
-        )
-
-        # -------------------------
-        # Pooling
-        # -------------------------
-
-        self.pool = nn.MaxPool2d(
-            kernel_size=2,
-            stride=2
-        )
-
-        # -------------------------
-        # Fully connected layers
-        # -------------------------
-
-        # Input image:
-        # 224 x 224
-        #
-        # After 3 pooling operations:
-        # 224 -> 112 -> 56 -> 28
-        #
-        # Therefore:
-        # 128 feature maps x 28 x 28
-
-        self.fc1 = nn.Linear(
-            128 * 28 * 28,
-            256
-        )
-
-        self.fc2 = nn.Linear(
-            256,
-            num_classes
-        )
+        
+        # Assign directly to self (not self.model)
+        self.features = efficientnet.features
+        self.avgpool = efficientnet.avgpool
+        self.classifier = efficientnet.classifier
 
     def forward(self, x):
-
-        # Conv block 1
-        x = self.pool(
-            F.relu(self.conv1(x))
-        )
-
-        # Conv block 2
-        x = self.pool(
-            F.relu(self.conv2(x))
-        )
-
-        # Conv block 3
-        x = self.pool(
-            F.relu(self.conv3(x))
-        )
-
-        # Flatten
+        x = self.features(x)
+        x = self.avgpool(x)
         x = torch.flatten(x, 1)
-
-        # Fully connected
-        x = F.relu(self.fc1(x))
-
-        # Output logits
-        x = self.fc2(x)
-
+        x = self.classifier(x)
         return x
 
 
@@ -128,21 +65,21 @@ class ModelManager:
         # used during training.
 
         self.class_names = [
-            "Pepper__bell___Bacterial_spot",
-            "Pepper__bell___healthy",
-            "Potato___Early_blight",
-            "Potato___Late_blight",
-            "Potato___healthy",
-            "Tomato_Bacterial_spot",
-            "Tomato_Early_blight",
-            "Tomato_Late_blight",
-            "Tomato_Leaf_Mold",
-            "Tomato_Septoria_leaf_spot",
-            "Tomato_Spider_mites_Two_spotted_spider_mite",
-            "Tomato__Target_Spot",
-            "Tomato__Tomato_YellowLeaf__Curl_Virus",
-            "Tomato__Tomato_mosaic_virus",
-            "Tomato_healthy",
+            'Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_rust',
+            'Apple___healthy', 'Blueberry___healthy', 'Cherry_(including_sour)___Powdery_mildew',
+            'Cherry_(including_sour)___healthy', 'Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot',
+            'Corn_(maize)___Common_rust_', 'Corn_(maize)___Northern_Leaf_Blight',
+            'Corn_(maize)___healthy', 'Grape___Black_rot', 'Grape___Esca_(Black_Measles)',
+            'Grape___Leaf_blight_(Isariopsis_Leaf_Spot)', 'Grape___healthy',
+            'Orange___Haunglongbing_(Citrus_greening)', 'Peach___Bacterial_spot',
+            'Peach___healthy', 'Pepper,_bell___Bacterial_spot', 'Pepper,_bell___healthy',
+            'Potato___Early_blight', 'Potato___Late_blight', 'Potato___healthy',
+            'Raspberry___healthy', 'Soybean___healthy', 'Squash___Powdery_mildew',
+            'Strawberry___Leaf_scorch', 'Strawberry___healthy', 'Tomato___Bacterial_spot',
+            'Tomato___Early_blight', 'Tomato___Late_blight', 'Tomato___Leaf_Mold',
+            'Tomato___Septoria_leaf_spot', 'Tomato___Spider_mites Two-spotted_spider_mite',
+            'Tomato___Target_Spot', 'Tomato___Tomato_Yellow_Leaf_Curl_Virus',
+            'Tomato___Tomato_mosaic_virus', 'Tomato___healthy'
         ]
 
     def download_model(self) -> Path:
@@ -207,14 +144,14 @@ class ModelManager:
                 model_path = self.download_model()
 
             logger.info(
-                f"Loading model from {model_path}..."
+                f"Loading EfficientNet-B0 model from {model_path}..."
             )
 
             # -------------------------
             # Initialize architecture
             # -------------------------
 
-            self.model = PlantDiseaseCNN(
+            self.model = PlantDiseaseEfficientNet(
                 num_classes=len(self.class_names)
             )
 
@@ -222,10 +159,20 @@ class ModelManager:
             # Load trained weights
             # -------------------------
 
-            state_dict = torch.load(
+            checkpoint = torch.load(
                 model_path,
                 map_location=self.device
             )
+            
+            # Extract model state dict from checkpoint
+            # The checkpoint contains: model_state_dict, class_names, etc.
+            if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint:
+                state_dict = checkpoint['model_state_dict']
+                # Update class names if available in checkpoint
+                if 'class_names' in checkpoint:
+                    self.class_names = checkpoint['class_names']
+            else:
+                state_dict = checkpoint
 
             self.model.load_state_dict(
                 state_dict
@@ -243,7 +190,7 @@ class ModelManager:
             self.is_loaded = True
 
             logger.info(
-                f"Model loaded successfully on {self.device}"
+                f"EfficientNet-B0 model loaded successfully on {self.device}"
             )
 
         except Exception as e:

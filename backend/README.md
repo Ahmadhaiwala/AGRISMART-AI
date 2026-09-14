@@ -84,12 +84,14 @@ Once the server is running, access the interactive API documentation:
 
 ## Model Information
 
-The API uses a CNN model for plant disease classification trained on 38 different plant disease classes. The model is automatically downloaded from HuggingFace Hub on first startup.
+The API uses an EfficientNet-B0 model for plant disease classification trained on 38 different plant disease classes. The model is automatically downloaded from HuggingFace Hub on first startup.
 
-- **Model**: Plant Disease CNN Baseline
+- **Model**: EfficientNet-B0 (38 classes)
 - **HuggingFace Repo**: [Ahmadhaiwala/agro_model](https://huggingface.co/Ahmadhaiwala/agro_model)
+- **Model File**: plant_disease_efficientnet_b0_38class_best.pth
 - **Classes**: 38 plant disease categories
 - **Input Size**: 224x224 RGB images
+- **Architecture**: EfficientNet-B0 with custom classifier
 
 ## Project Structure
 
@@ -114,8 +116,8 @@ backend/
 │   ├── model_loader.py    # Model loading and inference
 │   └── image_utils.py     # Image preprocessing
 ├── models/                 # Model files (not in git)
-│   ├── cache/             # HuggingFace cache
-│   └── plant_disease_cnn_baseline.pth
+│   ├── .cache/             # HuggingFace cache
+│   └── plant_disease_efficientnet_b0_38class_best.pth
 ├── main.py                # Application entry point
 ├── requirements.txt       # Python dependencies
 ├── .gitignore            # Git ignore rules

@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 from typing import List
+import os
 
 
 class Settings(BaseSettings):
@@ -25,7 +26,15 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./agrismart.db"
     
     # Model Settings
-    MODEL_PATH: str = "./models/disease_model.pth"
+    MODEL_PATH: str = "models/plant_disease_efficientnet_b0_38class_best.pth"
+    HF_MODEL_REPO: str = "Ahmadhaiwala/agro_model"
+    HF_MODEL_FILE: str = "plant_disease_efficientnet_b0_38class_best.pth"
+    DEVICE: str = "cuda" if os.getenv("CUDA_AVAILABLE", "false").lower() == "true" else "cpu"
+    
+    # Image Processing
+    IMAGE_SIZE: int = 224
+    MAX_IMAGE_SIZE: int = 10 * 1024 * 1024  # 10MB
+    ALLOWED_EXTENSIONS: List[str] = [".jpg", ".jpeg", ".png"]
     
     class Config:
         env_file = ".env"

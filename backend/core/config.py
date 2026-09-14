@@ -23,9 +23,9 @@ class Settings(BaseSettings):
     CORS_HEADERS: List[str] = ["*"]
     
     # Model Settings
-    MODEL_PATH: str = "models/plant_disease_cnn_baseline.pth"
+    MODEL_PATH: str = "models/plant_disease_efficientnet_b0_38class_best.pth"
     HF_MODEL_REPO: str = "Ahmadhaiwala/agro_model"
-    HF_MODEL_FILE: str = "plant_disease_cnn_baseline.pth"
+    HF_MODEL_FILE: str = "plant_disease_efficientnet_b0_38class_best.pth"
     DEVICE: str = "cuda" if os.getenv("CUDA_AVAILABLE", "false").lower() == "true" else "cpu"
     
     # Image Processing
