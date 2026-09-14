@@ -82,6 +82,48 @@ Once the server is running, access the interactive API documentation:
 - `POST /api/v1/model/reload` - Reload the model (admin)
 - `GET /api/v1/diseases` - Get list of all detectable diseases
 
+### Sustainability Score (Bonus Module D)
+- `POST /api/v1/sustainability/score` - Compute a sustainability score (0-100) from water
+  efficiency, resource use (fertilizer/pesticide), and crop health, with improvement
+  suggestions.
+
+  **Request body:**
+  ```json
+  {
+    "water_used_liters": 120,
+    "water_required_liters": 100,
+    "fertilizer_used_kg": 5,
+    "fertilizer_recommended_kg": 4,
+    "pesticide_used_kg": 0,
+    "pesticide_recommended_kg": 0,
+    "is_healthy": false,
+    "disease_confidence": 0.91
+  }
+  ```
+  `is_healthy` / `disease_confidence` are meant to be passed straight through from the
+  `/api/v1/predict` (disease detection) response for the same crop.
+
+  **Response:**
+  ```json
+  {
+    "success": true,
+    "overall_score": 57.2,
+    "grade": "C",
+    "sub_scores": { "water_efficiency": 80.0, "resource_use": 75.0, "crop_health": 9.0 },
+    "suggestions": ["Disease detected with meaningful confidence -- apply the recommended precaution promptly to prevent spread."],
+    "formula_version": "1.0"
+  }
+  ```
+
+  The exact formula (weights, grade bands, and rationale) is published in
+  [`/report/SUSTAINABILITY_FORMULA.md`](../report/SUSTAINABILITY_FORMULA.md) so the score is
+  fully reproducible. Try it via Swagger UI at `/docs` or:
+  ```bash
+  curl -X POST "http://localhost:8000/api/v1/sustainability/score" \
+    -H "Content-Type: application/json" \
+    -d '{"water_used_liters":120,"water_required_liters":100,"fertilizer_used_kg":5,"fertilizer_recommended_kg":4,"pesticide_used_kg":0,"pesticide_recommended_kg":0,"is_healthy":false,"disease_confidence":0.91}'
+  ```
+
 ## Model Information
 
 The API uses an EfficientNet-B0 model for plant disease classification trained on 38 different plant disease classes. The model is automatically downloaded from HuggingFace Hub on first startup.
@@ -103,12 +145,17 @@ backend/
 │   │   ├── __init__.py
 │   │   └── config.py      # Settings
 │   ├── modules/           # Feature modules
-│   │   └── disease_detection/  # Disease detection module
+│   │   ├── disease_detection/  # Disease detection module
+│   │   │   ├── __init__.py
+│   │   │   ├── router.py      # HTTP endpoints + UI
+│   │   │   ├── service.py     # Business logic
+│   │   │   ├── schemas.py     # Pydantic models
+│   │   │   └── model.py       # Database models
+│   │   └── sustainability/     # Sustainability score module (Bonus D)
 │   │       ├── __init__.py
-│   │       ├── router.py      # HTTP endpoints + UI
-│   │       ├── service.py     # Business logic
-│   │       ├── schemas.py     # Pydantic models
-│   │       └── model.py       # Database models
+│   │       ├── router.py      # POST /sustainability/score
+│   │       ├── service.py     # Scoring formula + suggestions
+│   │       └── schemas.py     # Pydantic models
 │   └── main.py            # FastAPI app factory
 ├── core/                   # Core utilities (shared)
 │   ├── __init__.py
@@ -172,6 +219,16 @@ Use the web interface at http://localhost:8000/api/v1/predict or use curl:
 ```bash
 curl -X POST "http://localhost:8000/api/v1/predict" -F "file=@plant_image.jpg"
 ```
+
+### Running Automated Tests
+
+```bash
+pytest tests/ -v
+```
+
+`tests/test_sustainability.py` covers the sustainability score module (formula
+correctness, grade bands, suggestion logic, and the HTTP endpoint contract) and does not
+require the disease-detection model or `torch` to be installed to run.
 
 ## License
 

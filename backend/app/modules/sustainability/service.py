@@ -46,6 +46,7 @@ class SustainabilityService:
         water_efficiency = _efficiency(data.water_used_liters, data.water_required_liters)
 
         fertilizer_efficiency = _efficiency(data.fertilizer_used_kg, data.fertilizer_recommended_kg)
+        pesticide_efficiency = None
         if data.pesticide_recommended_kg > 0:
             pesticide_efficiency = _efficiency(data.pesticide_used_kg, data.pesticide_recommended_kg)
             resource_use = (fertilizer_efficiency + pesticide_efficiency) / 2
@@ -62,7 +63,9 @@ class SustainabilityService:
         overall = round(overall, 1)
 
         grade = self._grade(overall)
-        suggestions = self._suggestions(data, water_efficiency, resource_use, crop_health)
+        suggestions = self._suggestions(
+            data, water_efficiency, fertilizer_efficiency, pesticide_efficiency, crop_health
+        )
 
         return {
             "success": True,
@@ -87,7 +90,13 @@ class SustainabilityService:
         return "D"
 
     @staticmethod
-    def _suggestions(data: SustainabilityInput, water_eff: float, resource_use: float, crop_health: float) -> List[str]:
+    def _suggestions(
+        data: SustainabilityInput,
+        water_eff: float,
+        fertilizer_eff: float,
+        pesticide_eff: float,
+        crop_health: float,
+    ) -> List[str]:
         tips: List[str] = []
 
         if water_eff < 70:
@@ -96,11 +105,17 @@ class SustainabilityService:
             else:
                 tips.append("Water applied is below the crop's requirement -- consider increasing irrigation to avoid crop stress.")
 
-        if resource_use < 70:
+        if fertilizer_eff < 70:
             if data.fertilizer_used_kg > data.fertilizer_recommended_kg:
                 tips.append("Fertilizer use is above the recommended amount -- reducing it can lower cost and runoff without hurting yield.")
             elif data.fertilizer_used_kg < data.fertilizer_recommended_kg:
                 tips.append("Fertilizer use is below the recommended amount -- crop may be under-nourished.")
+
+        if pesticide_eff is not None and pesticide_eff < 70:
+            if data.pesticide_used_kg > data.pesticide_recommended_kg:
+                tips.append("Pesticide use is above the recommended amount -- reducing it can lower cost, protect beneficial insects, and cut chemical runoff.")
+            elif data.pesticide_used_kg < data.pesticide_recommended_kg:
+                tips.append("Pesticide use is below the recommended amount -- pest pressure may go unchecked.")
 
         if crop_health < 70:
             tips.append("Disease detected with meaningful confidence -- apply the recommended precaution promptly to prevent spread.")
