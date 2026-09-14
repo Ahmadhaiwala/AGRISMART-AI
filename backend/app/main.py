@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.modules.disease_detection.router import router as disease_router
-
+from app.modules.sustainability.router import router as sustainability_router
 
 def create_app() -> FastAPI:
     """Application factory"""
