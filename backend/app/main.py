@@ -8,6 +8,7 @@ from app.modules.crop_recommendation.service import crop_service
 from app.modules.sustainability.router import router as sustainability_router
 from app.modules.smart_irrigation.router import router as irrigation_router
 from app.modules.smart_irrigation.service import irrigation_service
+from app.modules.smart_weather_based_Intelligence.router import router as weather_intelligence_router
 
 def create_app() -> FastAPI:
     """Application factory"""
@@ -61,6 +62,7 @@ def create_app() -> FastAPI:
     app.include_router(crop_router, prefix="/api/v1", tags=["Crop Recommendation"])
     app.include_router(sustainability_router, prefix="/api/v1", tags=["Sustainability"])
     app.include_router(irrigation_router, prefix="/api/v1", tags=["Smart Irrigation"])
+    app.include_router(weather_intelligence_router, prefix="/api/v1", tags=["Weather Intelligence"])
     
     @app.get("/")
     async def root():
@@ -76,7 +78,10 @@ def create_app() -> FastAPI:
                 "sustainability_score": "/api/v1/sustainability/score",
                 "irrigation_predict": "/api/v1/irrigation/predict",
                 "irrigation_health": "/api/v1/irrigation/health",
-                "irrigation_info": "/api/v1/irrigation/info"
+                "irrigation_info": "/api/v1/irrigation/info",
+                "weather_intelligence": "/api/v1/weather-intelligence",
+                "weather_intelligence_info": "/api/v1/weather-intelligence/info",
+                "sample_locations": "/api/v1/weather-intelligence/sample-locations"
             }
         }
     
