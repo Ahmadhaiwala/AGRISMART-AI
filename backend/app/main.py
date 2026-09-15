@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.modules.disease_detection.router import router as disease_router
+from app.modules.crop_recommendation.router import router as crop_router
+from app.modules.crop_recommendation.service import crop_service
 
 
 def create_app() -> FastAPI:
@@ -24,8 +26,29 @@ def create_app() -> FastAPI:
         allow_headers=settings.CORS_HEADERS,
     )
     
+    # Startup event to load models
+    @app.on_event("startup")
+    async def startup_event():
+        """Load ML models on startup"""
+        print("\n" + "="*80)
+        print("🚀 LOADING ML MODELS")
+        print("="*80)
+        
+        # Load crop recommendation model
+        print("\n📊 Loading Crop Recommendation Model...")
+        crop_loaded = crop_service.load_model()
+        if crop_loaded:
+            print("✅ Crop Recommendation Model loaded successfully")
+        else:
+            print("⚠️  Crop Recommendation Model failed to load")
+        
+        print("\n" + "="*80)
+        print("✅ STARTUP COMPLETE")
+        print("="*80 + "\n")
+    
     # Include routers
     app.include_router(disease_router, prefix="/api/v1", tags=["Disease Detection"])
+    app.include_router(crop_router, prefix="/api/v1", tags=["Crop Recommendation"])
     
     @app.get("/")
     async def root():
@@ -34,7 +57,11 @@ def create_app() -> FastAPI:
             "app_name": settings.APP_NAME,
             "version": settings.APP_VERSION,
             "docs": "/docs",
-            "predict_ui": "/api/v1/predict"
+            "endpoints": {
+                "disease_detection": "/api/v1/predict",
+                "crop_recommendation": "/api/v1/test/crop_recommendation",
+                "crop_health": "/api/v1/test/crop_recommendation/health"
+            }
         }
     
     @app.get("/health")
@@ -42,7 +69,8 @@ def create_app() -> FastAPI:
         """Health check endpoint"""
         return {
             "status": "healthy",
-            "app_name": settings.APP_NAME
+            "app_name": settings.APP_NAME,
+            "crop_model_loaded": crop_service.is_loaded()
         }
     
     return app
