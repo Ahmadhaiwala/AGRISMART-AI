@@ -5,7 +5,11 @@ Tests multilingual chat, agent decision-making, and rule-based logic
 
 import requests
 import json
+import sys
 from typing import Dict, Any
+
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
 
 
 BASE_URL = "http://localhost:8000/api/v1"
@@ -36,21 +40,12 @@ def test_farmer_assistant():
     # Test 1: English question about irrigation
     print("\n📝 Test 1: English - Irrigation question")
     request_data = {
-        "question": "Should I irrigate my tomato crop today?",
+        "message": "Should I irrigate my tomato crop today?",
         "language": "en",
         "farm_id": "farm_001",
-        "context": {
-            "crop_name": "Tomato",
-            "growth_stage": "Flowering",
-            "soil_moisture": 28,
-            "soil_type": "Loamy",
-            "temperature": 31,
-            "humidity": 78,
-            "rain_probability": 85,
-            "rain_amount": 12,
-            "irrigation_required": False,
-            "irrigation_reason": "High rain probability (85%) and rain expected (12mm)"
-        }
+        "crop_name": "Tomato",
+        "growth_stage": "Flowering",
+        "soil_moisture": 28
     }
     
     response = requests.post(
@@ -63,16 +58,11 @@ def test_farmer_assistant():
     # Test 2: Hindi question about disease
     print("\n📝 Test 2: Hindi - Disease question")
     request_data = {
-        "question": "मेरे टमाटर के पौधे पर धब्बे हैं। क्या करूं?",
+        "message": "मेरे टमाटर के पौधे पर धब्बे हैं। क्या करूं?",
         "language": "hi",
         "farm_id": "farm_002",
-        "context": {
-            "crop_name": "Tomato",
-            "growth_stage": "Fruiting",
-            "disease_detected": "Early Blight",
-            "disease_confidence": 0.91,
-            "is_healthy": False
-        }
+        "crop_name": "Tomato",
+        "growth_stage": "Fruiting"
     }
     
     response = requests.post(
@@ -85,17 +75,12 @@ def test_farmer_assistant():
     # Test 3: Gujarati question about general farming
     print("\n📝 Test 3: Gujarati - General question")
     request_data = {
-        "question": "ટામેટાની સારી પેદાશ માટે શું કરવું?",
+        "message": "ટામેટાની સારી પેદાશ માટે શું કરવું?",
         "language": "gu",
         "farm_id": "farm_003",
-        "context": {
-            "crop_name": "Tomato",
-            "growth_stage": "Vegetative",
-            "soil_moisture": 45,
-            "soil_type": "Loamy",
-            "sustainability_score": 78,
-            "sustainability_grade": "B"
-        }
+        "crop_name": "Tomato",
+        "growth_stage": "Vegetative",
+        "soil_moisture": 45
     }
     
     response = requests.post(
@@ -108,7 +93,7 @@ def test_farmer_assistant():
     # Test 4: English question with minimal context
     print("\n📝 Test 4: English - Question with minimal context")
     request_data = {
-        "question": "What is the best time to harvest wheat?",
+        "message": "What is the best time to harvest wheat?",
         "language": "en",
         "farm_id": "farm_004"
     }

@@ -50,7 +50,7 @@ class LLMClient:
                 self.api_url,
                 headers=headers,
                 json=payload,
-                timeout=30
+                timeout=12
             )
             response.raise_for_status()
             

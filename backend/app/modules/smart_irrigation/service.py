@@ -55,20 +55,20 @@ class SmartIrrigationService:
             encoders_path = models_dir / "label_encoders.joblib"
             
             if not model_path.exists():
-                print(f"❌ Model not found at {model_path}")
+                print(f"[ERROR] Model not found at {model_path}")
                 return False
             
             if not metadata_path.exists():
-                print(f"❌ Metadata not found at {metadata_path}")
+                print(f"[ERROR] Metadata not found at {metadata_path}")
                 return False
             
             if not encoders_path.exists():
-                print(f"❌ Label encoders not found at {encoders_path}")
+                print(f"[ERROR] Label encoders not found at {encoders_path}")
                 return False
             
             # Load model
             self.model = joblib.load(model_path)
-            print(f"✓ RandomForest model loaded from {model_path}")
+            print(f"[OK] RandomForest model loaded from {model_path}")
             
             # Load metadata
             self.metadata = joblib.load(metadata_path)
@@ -77,14 +77,14 @@ class SmartIrrigationService:
             # Load label encoders
             self.label_encoders = joblib.load(encoders_path)
             
-            print(f"✓ Metadata loaded: {len(self.feature_names)} features")
-            print(f"✓ Model accuracy: {self.metadata['metrics']['test_accuracy']:.4f}")
+            print(f"[OK] Metadata loaded: {len(self.feature_names)} features")
+            print(f"[OK] Model accuracy: {self.metadata['metrics']['test_accuracy']:.4f}")
             
             self._is_loaded = True
             return True
             
         except Exception as e:
-            print(f"❌ Error loading smart irrigation model: {e}")
+            print(f"[ERROR] Error loading smart irrigation model: {e}")
             import traceback
             traceback.print_exc()
             return False

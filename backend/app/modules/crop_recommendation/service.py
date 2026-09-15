@@ -33,31 +33,31 @@ class CropRecommendationService:
             metadata_path = models_dir / "crop_recommendation_metadata_fixed.joblib"
             
             if not model_path.exists():
-                print(f"❌ Model not found at {model_path}")
+                print(f"[ERROR] Model not found at {model_path}")
                 return False
             
             if not metadata_path.exists():
-                print(f"❌ Metadata not found at {metadata_path}")
+                print(f"[ERROR] Metadata not found at {metadata_path}")
                 return False
             
             # Load model
             self.model = CatBoostClassifier()
             self.model.load_model(str(model_path))
-            print(f"✓ CatBoost model loaded from {model_path}")
+            print(f"[OK] CatBoost model loaded from {model_path}")
             
             # Load metadata
             self.metadata = joblib.load(metadata_path)
             self.feature_names = self.metadata['feature_names']
             self.classes = self.metadata['classes']
             
-            print(f"✓ Metadata loaded: {len(self.feature_names)} features, {len(self.classes)} classes")
-            print(f"✓ Model metrics: Test Accuracy = {self.metadata['metrics']['test_accuracy']:.4f}")
+            print(f"[OK] Metadata loaded: {len(self.feature_names)} features, {len(self.classes)} classes")
+            print(f"[OK] Model metrics: Test Accuracy = {self.metadata['metrics']['test_accuracy']:.4f}")
             
             self._is_loaded = True
             return True
             
         except Exception as e:
-            print(f"❌ Error loading crop recommendation model: {e}")
+            print(f"[ERROR] Error loading crop recommendation model: {e}")
             import traceback
             traceback.print_exc()
             return False

@@ -36,27 +36,27 @@ def create_app() -> FastAPI:
     async def startup_event():
         """Load ML models on startup"""
         print("\n" + "="*80)
-        print("🚀 LOADING ML MODELS")
+        print("[STARTUP] LOADING ML MODELS")
         print("="*80)
         
         # Load crop recommendation model
-        print("\n📊 Loading Crop Recommendation Model...")
+        print("\n[CROP] Loading Crop Recommendation Model...")
         crop_loaded = crop_service.load_model()
         if crop_loaded:
-            print("✅ Crop Recommendation Model loaded successfully")
+            print("[OK] Crop Recommendation Model loaded successfully")
         else:
-            print("⚠️  Crop Recommendation Model failed to load")
+            print("[WARN] Crop Recommendation Model failed to load")
         
         # Load smart irrigation model
-        print("\n💧 Loading Smart Irrigation Model...")
+        print("\n[IRRIGATION] Loading Smart Irrigation Model...")
         irrigation_loaded = irrigation_service.load_model()
         if irrigation_loaded:
-            print("✅ Smart Irrigation Model loaded successfully")
+            print("[OK] Smart Irrigation Model loaded successfully")
         else:
-            print("⚠️  Smart Irrigation Model failed to load")
+            print("[WARN] Smart Irrigation Model failed to load")
         
         print("\n" + "="*80)
-        print("✅ STARTUP COMPLETE")
+        print("[OK] STARTUP COMPLETE")
         print("="*80 + "\n")
     
     # Include routers

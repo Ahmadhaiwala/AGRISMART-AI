@@ -38,12 +38,13 @@ class Settings(BaseSettings):
     
     # LLM Settings (OpenRouter)
     OPENROUTER_API_KEY: str = os.getenv("OPENROUTER_API_KEY", "")
-    OPENROUTER_MODEL: str = os.getenv("OPENROUTER_MODEL", "qwen/qwen-2-7b-instruct:free")
+    OPENROUTER_MODEL: str = os.getenv("OPENROUTER_MODEL", "openrouter/free")
     OPENROUTER_API_URL: str = "https://openrouter.ai/api/v1/chat/completions"
     
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "ignore"
 
 
 settings = Settings()
