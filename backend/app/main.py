@@ -5,7 +5,7 @@ from app.core.config import settings
 from app.modules.disease_detection.router import router as disease_router
 from app.modules.crop_recommendation.router import router as crop_router
 from app.modules.crop_recommendation.service import crop_service
-
+from app.modules.sustainability.router import router as sustainability_router
 
 def create_app() -> FastAPI:
     """Application factory"""
@@ -49,6 +49,7 @@ def create_app() -> FastAPI:
     # Include routers
     app.include_router(disease_router, prefix="/api/v1", tags=["Disease Detection"])
     app.include_router(crop_router, prefix="/api/v1", tags=["Crop Recommendation"])
+    app.include_router(sustainability_router, prefix="/api/v1", tags=["Sustainability"])
     
     @app.get("/")
     async def root():
@@ -60,7 +61,8 @@ def create_app() -> FastAPI:
             "endpoints": {
                 "disease_detection": "/api/v1/predict",
                 "crop_recommendation": "/api/v1/test/crop_recommendation",
-                "crop_health": "/api/v1/test/crop_recommendation/health"
+                "crop_health": "/api/v1/test/crop_recommendation/health",
+                "sustainability_score": "/api/v1/sustainability/score"
             }
         }
     
