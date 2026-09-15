@@ -59,19 +59,18 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
-# ML Models and Data
-*.pth
-*.pt
-*.h5
-*.pkl
-*.joblib
-models/
+# ML Models and Data (exclude large disease detection models)
+models/*.pth
+models/*.pt
+models/.cache/
 data/
 datasets/
 
+# Training artifacts (CatBoost)
+catboost_info/
+
 # Jupyter Notebooks
 .ipynb_checkpoints/
-*.ipynb
 
 # FastAPI/Uvicorn
 *.pid
