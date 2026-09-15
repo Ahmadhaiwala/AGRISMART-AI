@@ -6,7 +6,7 @@
 
 ## 🎥 Demo Video
 
-https://github.com/Ahmadhaiwala/AGRISMART-AI/blob/main/https://drive.google.com/file/d/19cAX-YqK6HOsBLiqdRxlFuxvClKwpTNq/view?usp=drivesdk
+https://drive.google.com/file/d/19cAX-YqK6HOsBLiqdRxlFuxvClKwpTNq/view?usp=drivesdk
 
 ---
 
