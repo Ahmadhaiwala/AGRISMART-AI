@@ -10,6 +10,8 @@ Backend API service for Agrismart AI application, built with FastAPI and PyTorch
 - **Crop Recommendation** - CatBoost model (57 crops)
 - **Smart Irrigation** - RandomForest predictor (96.47% accuracy)
 - **Weather Intelligence** - Rule-based farming decisions with Open-Meteo API
+- **Farmer Assistant** - Multilingual AI chat assistant (English, Hindi, Gujarati)
+- **Agentic Advisor** - Autonomous decision-making agent with rule-based logic
 - **Sustainability Score** - Farm sustainability assessment
 - Image processing and analysis
 - Web UI for testing
@@ -42,6 +44,14 @@ Backend API service for Agrismart AI application, built with FastAPI and PyTorch
    ```bash
    pip install -r requirements.txt
    ```
+
+4. **Configure LLM API Key** (for Farmer Assistant & Agentic Advisor):
+   - Copy `.env.example` to `.env`
+   - Get your OpenRouter API key from: https://openrouter.ai/keys
+   - Add to `.env`:
+     ```
+     OPENROUTER_API_KEY=your_api_key_here
+     ```
 
 ## Running the Application
 
@@ -96,6 +106,75 @@ Once the server is running, access the interactive API documentation:
 - `POST /api/v1/weather-intelligence` - Get actionable farming insights from weather + farm conditions
 - `GET /api/v1/weather-intelligence/info` - Get system information and rules
 - `GET /api/v1/weather-intelligence/sample-locations` - Get sample test locations
+
+### Farmer Assistant (Module E)
+- `POST /api/v1/assistant/chat` - Chat with multilingual AI farming assistant
+
+  **Request body:**
+  ```json
+  {
+    "question": "Should I irrigate my tomato crop today?",
+    "language": "en",
+    "farm_id": "farm_001",
+    "context": {
+      "crop_name": "Tomato",
+      "soil_moisture": 28,
+      "rain_probability": 85
+    }
+  }
+  ```
+
+  **Response:**
+  ```json
+  {
+    "answer": "Based on the high rain probability (85%), I recommend delaying irrigation...",
+    "language": "en",
+    "context_used": true,
+    "timestamp": "2024-01-15T10:30:00"
+  }
+  ```
+
+  **Supported Languages:**
+  - `en` - English
+  - `hi` - Hindi (हिन्दी)
+  - `gu` - Gujarati (ગુજરાતી)
+
+### Agentic Advisor (Module G)
+- `POST /api/v1/agent/run/{farm_id}` - Execute agent decision loop
+- `GET /api/v1/agent/status/{farm_id}` - Get latest agent recommendation
+
+  **Agent Flow:** OBSERVE → ANALYZE → DECIDE → ACT → NOTIFY
+
+  **Request body:**
+  ```json
+  {
+    "crop_name": "Tomato",
+    "soil_moisture": 28,
+    "rain_probability": 85,
+    "disease_detected": "Early Blight",
+    "disease_confidence": 0.91
+  }
+  ```
+
+  **Response:**
+  ```json
+  {
+    "success": true,
+    "farm_id": "farm_001",
+    "decision": {
+      "action": "SKIP_IRRIGATION",
+      "reason": "High rain probability detected",
+      "priority": "high",
+      "confidence": 0.95
+    },
+    "notification": {
+      "notification_id": "notif_123",
+      "title": "Irrigation Recommendation",
+      "message": "Delay irrigation - rain expected soon (85% probability)",
+      "created_at": "2024-01-15T10:30:00"
+    }
+  }
+  ```
 
 ### Sustainability Score (Bonus Module)
 - `POST /api/v1/sustainability/score` - Compute sustainability score (0-100)
@@ -261,7 +340,30 @@ The API integrates multiple AI/ML models for comprehensive agricultural intellig
   - Work hour optimization
 - **No API Key Required**: Free, open-source weather data
 
-### 5. Sustainability Score - Formula-Based
+### 5. Farmer Assistant - LLM-Based (Qwen via OpenRouter)
+- **LLM**: Qwen 2 7B Instruct (via OpenRouter API)
+- **Type**: Conversational AI with grounded context
+- **Features**: 
+  - Multilingual support (English, Hindi, Gujarati)
+  - Grounded in real farm data (never fabricates)
+  - Explains recommendations from other modules
+  - Farmer-friendly language
+- **Architecture**: Structured JSON context (no RAG/embeddings)
+- **API**: OpenRouter (https://openrouter.ai/)
+
+### 6. Agentic Advisor - Rule-Based + LLM Explanation
+- **Type**: Autonomous agent with deterministic rules
+- **Decision Logic**: 100% rule-based (no AI decisions)
+- **LLM Role**: Only generates farmer-friendly explanations
+- **Agent Loop**: OBSERVE → ANALYZE → DECIDE → ACT → NOTIFY
+- **Rules**:
+  - Skip irrigation: rain probability > 70%
+  - Urgent irrigation: moisture < 25% + no rain
+  - Disease treatment: confidence > 80%
+  - Harvest ready: mature stage + low rain
+- **Notifications**: In-memory store (MVP), can be extended to SMS/Email
+
+### 7. Sustainability Score - Formula-Based
 - **Type**: Algorithmic calculation
 - **Inputs**: Water efficiency, resource use, crop health
 - **Output**: Score (0-100) with letter grade (A-F)
@@ -277,13 +379,29 @@ backend/
 │   │   ├── __init__.py
 │   │   └── config.py      # Settings
 │   ├── modules/           # Feature modules
-│   │   ├── disease_detection/  # Disease detection module
+│   │   ├── disease_detection/       # Disease detection module
 │   │   │   ├── __init__.py
-│   │   │   ├── router.py      # HTTP endpoints + UI
-│   │   │   ├── service.py     # Business logic
-│   │   │   ├── schemas.py     # Pydantic models
-│   │   │   └── model.py       # Database models
-│   │   └── sustainability/     # Sustainability score module (Bonus D)
+│   │   │   ├── router.py           # HTTP endpoints + UI
+│   │   │   ├── service.py          # Business logic
+│   │   │   ├── schemas.py          # Pydantic models
+│   │   │   └── model.py            # Database models
+│   │   ├── crop_recommendation/    # Crop recommendation module
+│   │   ├── smart_irrigation/       # Smart irrigation module
+│   │   ├── smart_weather_based_Intelligence/  # Weather intelligence
+│   │   ├── farmer_assistant/       # Farmer assistant chatbot (Module E)
+│   │   │   ├── __init__.py
+│   │   │   ├── router.py           # Chat endpoint
+│   │   │   ├── service.py          # LLM interaction + context
+│   │   │   ├── schemas.py          # Request/response models
+│   │   │   └── prompts.py          # System prompts (EN/HI/GU)
+│   │   ├── agentic_advisor/        # Agentic advisor (Module G)
+│   │   │   ├── __init__.py
+│   │   │   ├── router.py           # Agent execution endpoints
+│   │   │   ├── agent.py            # Main agent loop
+│   │   │   ├── rules.py            # Decision rules
+│   │   │   ├── notifier.py         # Notification system
+│   │   │   └── schemas.py          # Agent data models
+│   │   └── sustainability/         # Sustainability score module (Bonus D)
 │   │       ├── __init__.py
 │   │       ├── router.py      # POST /sustainability/score
 │   │       ├── service.py     # Scoring formula + suggestions
@@ -293,7 +411,9 @@ backend/
 │   ├── __init__.py
 │   ├── config.py          # Application settings
 │   ├── model_loader.py    # Model loading and inference
-│   └── image_utils.py     # Image preprocessing
+│   ├── image_utils.py     # Image preprocessing
+│   ├── llm_client.py      # OpenRouter/Qwen LLM client
+│   └── farm_context.py    # Farm context builder
 ├── models/                 # Model files (not in git)
 │   ├── .cache/             # HuggingFace cache
 │   └── plant_disease_efficientnet_b0_38class_best.pth
@@ -338,6 +458,10 @@ The application follows a clean, modular architecture:
 - **requests-cache**: Caching for API responses
 - **retry-requests**: Automatic retry logic
 
+### LLM Integration
+- **requests**: HTTP client for OpenRouter API
+- **OpenRouter**: LLM API gateway (supports multiple models)
+
 ### Utilities
 - **HuggingFace Hub**: Model downloading
 - **pandas**: Data manipulation
@@ -374,6 +498,26 @@ curl -X POST "http://localhost:8000/api/v1/predict" -F "file=@plant_image.jpg"
 ```bash
 pytest tests/ -v
 ```
+
+### Testing Farmer Assistant & Agentic Advisor
+
+Run the comprehensive test script:
+
+```bash
+python test_assistant_and_agent.py
+```
+
+This will test:
+- Multilingual chat (English, Hindi, Gujarati)
+- Agent decision-making scenarios
+- Rule-based irrigation/disease/harvest recommendations
+- Notification generation
+- Status retrieval
+
+**Requirements for tests:**
+1. Backend server running on http://localhost:8000
+2. `OPENROUTER_API_KEY` configured in `.env` file
+3. All ML models loaded successfully
 
 `tests/test_sustainability.py` covers the sustainability score module (formula
 correctness, grade bands, suggestion logic, and the HTTP endpoint contract) and does not

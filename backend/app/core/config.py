@@ -36,6 +36,11 @@ class Settings(BaseSettings):
     MAX_IMAGE_SIZE: int = 10 * 1024 * 1024  # 10MB
     ALLOWED_EXTENSIONS: List[str] = [".jpg", ".jpeg", ".png"]
     
+    # LLM Settings (OpenRouter)
+    OPENROUTER_API_KEY: str = os.getenv("OPENROUTER_API_KEY", "")
+    OPENROUTER_MODEL: str = os.getenv("OPENROUTER_MODEL", "qwen/qwen-2-7b-instruct:free")
+    OPENROUTER_API_URL: str = "https://openrouter.ai/api/v1/chat/completions"
+    
     class Config:
         env_file = ".env"
         case_sensitive = True

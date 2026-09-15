@@ -9,6 +9,8 @@ from app.modules.sustainability.router import router as sustainability_router
 from app.modules.smart_irrigation.router import router as irrigation_router
 from app.modules.smart_irrigation.service import irrigation_service
 from app.modules.smart_weather_based_Intelligence.router import router as weather_intelligence_router
+from app.modules.farmer_assistant.router import router as farmer_assistant_router
+from app.modules.agentic_advisor.router import router as agentic_advisor_router
 
 def create_app() -> FastAPI:
     """Application factory"""
@@ -63,6 +65,8 @@ def create_app() -> FastAPI:
     app.include_router(sustainability_router, prefix="/api/v1", tags=["Sustainability"])
     app.include_router(irrigation_router, prefix="/api/v1", tags=["Smart Irrigation"])
     app.include_router(weather_intelligence_router, prefix="/api/v1", tags=["Weather Intelligence"])
+    app.include_router(farmer_assistant_router, prefix="/api/v1", tags=["Farmer Assistant"])
+    app.include_router(agentic_advisor_router, prefix="/api/v1", tags=["Agentic Advisor"])
     
     @app.get("/")
     async def root():
@@ -81,7 +85,10 @@ def create_app() -> FastAPI:
                 "irrigation_info": "/api/v1/irrigation/info",
                 "weather_intelligence": "/api/v1/weather-intelligence",
                 "weather_intelligence_info": "/api/v1/weather-intelligence/info",
-                "sample_locations": "/api/v1/weather-intelligence/sample-locations"
+                "sample_locations": "/api/v1/weather-intelligence/sample-locations",
+                "farmer_assistant_chat": "/api/v1/assistant/chat",
+                "agent_run": "/api/v1/agent/run/{farm_id}",
+                "agent_status": "/api/v1/agent/status/{farm_id}"
             }
         }
     
