@@ -2,6 +2,9 @@
 
 Backend API service for Agrismart AI application, built with FastAPI and PyTorch for agricultural intelligence and plant disease detection.
 
+> 📚 **Documentation**: See **[docs/](docs/)** folder for detailed guides and implementation documentation.  
+> 🚀 **Quick Start**: See **[docs/QUICKSTART_E_G.md](docs/QUICKSTART_E_G.md)** to get Modules E & G running in 5 minutes.
+
 ## Features
 
 - FastAPI-based REST API
@@ -379,15 +382,15 @@ backend/
 │   │   ├── __init__.py
 │   │   └── config.py      # Settings
 │   ├── modules/           # Feature modules
-│   │   ├── disease_detection/       # Disease detection module
+│   │   ├── disease_detection/       # Disease detection module (Module A)
 │   │   │   ├── __init__.py
 │   │   │   ├── router.py           # HTTP endpoints + UI
 │   │   │   ├── service.py          # Business logic
 │   │   │   ├── schemas.py          # Pydantic models
 │   │   │   └── model.py            # Database models
-│   │   ├── crop_recommendation/    # Crop recommendation module
-│   │   ├── smart_irrigation/       # Smart irrigation module
-│   │   ├── smart_weather_based_Intelligence/  # Weather intelligence
+│   │   ├── crop_recommendation/    # Crop recommendation module (Module B)
+│   │   ├── smart_irrigation/       # Smart irrigation module (Module C)
+│   │   ├── smart_weather_based_Intelligence/  # Weather intelligence (Module D)
 │   │   ├── farmer_assistant/       # Farmer assistant chatbot (Module E)
 │   │   │   ├── __init__.py
 │   │   │   ├── router.py           # Chat endpoint
@@ -401,11 +404,11 @@ backend/
 │   │   │   ├── rules.py            # Decision rules
 │   │   │   ├── notifier.py         # Notification system
 │   │   │   └── schemas.py          # Agent data models
-│   │   └── sustainability/         # Sustainability score module (Bonus D)
+│   │   └── sustainability/         # Sustainability score module (Bonus)
 │   │       ├── __init__.py
-│   │       ├── router.py      # POST /sustainability/score
-│   │       ├── service.py     # Scoring formula + suggestions
-│   │       └── schemas.py     # Pydantic models
+│   │       ├── router.py           # POST /sustainability/score
+│   │       ├── service.py          # Scoring formula + suggestions
+│   │       └── schemas.py          # Pydantic models
 │   └── main.py            # FastAPI app factory
 ├── core/                   # Core utilities (shared)
 │   ├── __init__.py
@@ -417,6 +420,23 @@ backend/
 ├── models/                 # Model files (not in git)
 │   ├── .cache/             # HuggingFace cache
 │   └── plant_disease_efficientnet_b0_38class_best.pth
+├── tests/                  # Test files
+│   ├── __init__.py
+│   ├── test_assistant_and_agent.py    # Tests for Modules E & G
+│   ├── test_weather_intelligence.py   # Tests for Module D
+│   ├── test_crop_api.py               # Tests for Module B
+│   ├── test_irrigation_api.py         # Tests for Module C
+│   ├── test_sustainability.py         # Tests for sustainability
+│   └── README.md                      # Test documentation
+├── docs/                   # Documentation
+│   ├── README.md          # Documentation index
+│   ├── QUICKSTART_E_G.md  # Quick start guide
+│   └── implementation/    # Implementation guides
+│       ├── IMPLEMENTATION_SUMMARY.md   # What was built
+│       ├── MODULES_E_G_GUIDE.md       # Technical deep dive
+│       └── MODULES_SUMMARY.md         # Modules overview
+├── scripts/                # Utility scripts
+│   └── analyze_irrigation_data.py
 ├── main.py                # Application entry point
 ├── requirements.txt       # Python dependencies
 ├── .gitignore            # Git ignore rules
@@ -496,7 +516,14 @@ curl -X POST "http://localhost:8000/api/v1/predict" -F "file=@plant_image.jpg"
 ### Running Automated Tests
 
 ```bash
+# Run pytest tests
 pytest tests/ -v
+
+# Run specific test suites
+python tests/test_assistant_and_agent.py      # Modules E & G
+python tests/test_weather_intelligence.py     # Module D
+python tests/test_crop_api.py                 # Module B
+python tests/test_irrigation_api.py           # Module C
 ```
 
 ### Testing Farmer Assistant & Agentic Advisor
@@ -504,7 +531,7 @@ pytest tests/ -v
 Run the comprehensive test script:
 
 ```bash
-python test_assistant_and_agent.py
+python tests/test_assistant_and_agent.py
 ```
 
 This will test:
@@ -518,6 +545,8 @@ This will test:
 1. Backend server running on http://localhost:8000
 2. `OPENROUTER_API_KEY` configured in `.env` file
 3. All ML models loaded successfully
+
+See **[tests/README.md](tests/README.md)** for detailed test documentation.
 
 `tests/test_sustainability.py` covers the sustainability score module (formula
 correctness, grade bands, suggestion logic, and the HTTP endpoint contract) and does not

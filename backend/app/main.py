@@ -80,6 +80,8 @@ def create_app() -> FastAPI:
                 "crop_recommendation": "/api/v1/test/crop_recommendation",
                 "crop_health": "/api/v1/test/crop_recommendation/health",
                 "sustainability_score": "/api/v1/sustainability/score",
+                "sustainability_integrated": "/api/v1/sustainability/score/integrated",
+                "sustainability_info": "/api/v1/sustainability/info",
                 "irrigation_predict": "/api/v1/irrigation/predict",
                 "irrigation_health": "/api/v1/irrigation/health",
                 "irrigation_info": "/api/v1/irrigation/info",
